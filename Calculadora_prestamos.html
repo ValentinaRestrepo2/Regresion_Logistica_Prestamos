@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Préstamos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        /* --- ESTILOS CSS --- */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --input-border: #d1d5db;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Etiquetas de impacto */
+        .badge {
+            font-size: 0.75rem;
+            color: #4b5563;
+            padding: 2px 8px;
+            margin-left: 1px;
+            vertical-align: middle;
+            font-weight: normal;
+        }
+        
+        .badge-neg { color: #991b1b; }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Estilo para placeholders en selects */
+        select:invalid {
+            color: #9ca3af;
+        }
+        option {
+            color: #1f2937;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .approved {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 2px solid #34d399;
+        }
+
+        .rejected {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 2px solid #f87171;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="bi bi-calculator"></i> Calculadora de Crédito</h1>
+    <p class="subtitle">Complete los datos a continuación para evaluar su solicitud.</p>
+
+    <form id="loanForm">
+        
+        <div class="form-group">
+            <label><i class="bi bi-newspaper"></i> ¿Tiene historial de Crédito? <span class="badge badge-neg">*</span></label>
+            <select id="historial_credito" required>
+                <option value="" disabled selected hidden>Seleccione una opción...</option>
+                <option value="1">Sí (Deudas pagadas a tiempo)</option>
+                <option value="0">No (Incumplimientos previos)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="bi bi-house-door-fill"></i> ¿Qué tipo de propiedad posee? <span class="badge badge-neg">*</span></label>
+            <select id="area_propiedad" required>
+                <option value="" disabled selected hidden>Seleccione un tipo...</option>
+                <option value="Semiurban">Semi-Urbana</option>
+                <option value="Urban">Urbana</option>
+                <option value="Rural">Rural</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="bi bi-person-heart"></i> ¿Cuál es su estado civil?<span class="badge badge-neg">*</span></label>
+            <select id="casado" required>
+                <option value="" disabled selected hidden>Seleccione estado civil...</option>
+                <option value="1">Casado/a</option>
+                <option value="0">Soltero/a</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="bi bi-person-badge"></i> ¿Es empleado independiente? <span class="badge badge-neg">*</span></label>
+            <select id="autoempleado" required>
+                <option value="" disabled selected hidden>Seleccione situación laboral...</option>
+                <option value="0">No (Empleado)</option>
+                <option value="1">Sí (Independiente)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="bi bi-mortarboard"></i> Nivel Educativo: ¿Es usted graduado? <span class="badge badge-neg">*</span></label>
+            <select id="educacion" required>
+                <option value="" disabled selected hidden>Seleccione nivel...</option>
+                <option value="1">Graduado (Universitario)</option>
+                <option value="0">No Graduado</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="bi bi-gender-ambiguous"></i> Género <span class="badge badge-neg">*</span></label>
+            <select id="genero" required>
+                <option value="" disabled selected hidden>Seleccione género...</option>
+                <option value="1">Masculino</option>
+                <option value="0">Femenino</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="bi bi-people-fill"></i> ¿Cuántas personas dependen económicamente de usted? <span class="badge badge-neg">*</span></label>
+            <input type="number" id="dependientes" min="0" max="10" placeholder="Ej: 0, 1, 2..." required>
+        </div>
+
+        <button type="button" onclick="calcularPrestamo()">Evaluar Solicitud</button>
+
+    </form>
+
+    <div id="result">
+        <h2 id="decisionText" style="margin:0; font-size:1.4rem;"></h2>
+        <p id="probText" style="margin:5px 0 0 0;"></p>
+        <div id="iconResult" style="font-size: 3rem; margin-top: 10px;"></div>
+    </div>
+</div>
+
+<script>
+    function calcularPrestamo() {
+        // Obtener elementos
+        const elHistorial = document.getElementById('historial_credito');
+        const elArea = document.getElementById('area_propiedad');
+        const elCasado = document.getElementById('casado');
+        const elAuto = document.getElementById('autoempleado');
+        const elEdu = document.getElementById('educacion');
+        const elGenero = document.getElementById('genero');
+        const elDep = document.getElementById('dependientes');
+
+        // Validación simple de campos vacíos
+        if (!elHistorial.value || !elArea.value || !elCasado.value || 
+            !elAuto.value || !elEdu.value || !elGenero.value || elDep.value === "") {
+            alert("Por favor, complete todos los campos para realizar el cálculo.");
+            return;
+        }
+
+        // Obtener valores numéricos
+        const historialCredito = parseFloat(elHistorial.value);
+        const areaPropiedad = elArea.value;
+        const casado = parseFloat(elCasado.value);
+        const autoempleado = parseFloat(elAuto.value);
+        const educacion = parseFloat(elEdu.value);
+        const genero = parseFloat(elGenero.value);
+        const dependientes = parseFloat(elDep.value);
+
+        // --- COEFICIENTES DEL MODELO---
+        const INTERCEPTO = -1.5238;
+        const C_HISTORIAL = 3.4673;
+        const C_AREA_SEMIURBAN = 0.9140;
+        const C_AREA_URBAN = 0.2388; // Rural es 0
+        const C_CASADO = 0.6922;
+        const C_AUTOEMPLEADO = -0.6195;
+        const C_EDUCACION = 0.3219;
+        const C_GENERO = -0.2298;
+        const C_DEPENDIENTES = -0.0698;
+
+        let val_AreaSemiurban = (areaPropiedad === 'Semiurban') ? 1 : 0;
+        let val_AreaUrban = (areaPropiedad === 'Urban') ? 1 : 0;
+
+        // --- CÁLCULO DE Z ---
+        let z = INTERCEPTO +
+                (C_HISTORIAL * historialCredito) +
+                (C_AREA_SEMIURBAN * val_AreaSemiurban) +
+                (C_AREA_URBAN * val_AreaUrban) +
+                (C_CASADO * casado) +
+                (C_AUTOEMPLEADO * autoempleado) +
+                (C_EDUCACION * educacion) +
+                (C_GENERO * genero) +
+                (C_DEPENDIENTES * dependientes);
+
+        // --- FUNCIÓN DE PROBABILIDAD ---
+        let probabilidad = 1 / (1 + Math.exp(-z));
+
+        // --- RESULTADO ---
+        const resultDiv = document.getElementById('result');
+        const decisionTxt = document.getElementById('decisionText');
+        const probTxt = document.getElementById('probText');
+        const iconRes = document.getElementById('iconResult');
+
+        let texto = "";
+        let icono = "";
+        let clase = "";
+
+        if (probabilidad >= 0.5) {
+            texto = "PRÉSTAMO APROBADO";
+            icono = "✅";
+            clase = "approved";
+        } else {
+            texto = "PRÉSTAMO RECHAZADO";
+            icono = "❌";
+            clase = "rejected";
+        }
+
+        // Mostrar
+        decisionTxt.innerText = texto;
+        probTxt.innerText = `Probabilidad de pago: ${(probabilidad * 100).toFixed(2)}%`;
+        iconRes.innerText = icono;
+
+        resultDiv.className = clase;
+        resultDiv.style.display = "block";
+        resultDiv.scrollIntoView({behavior: "smooth"});
+    }
+</script>
+
+</body>
+</html>
