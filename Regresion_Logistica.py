@@ -115,3 +115,7 @@ print (metrics.precision_score(y_test,y_pred))
 print (metrics.recall_score(y_test,y_pred))
 #F1 Score
 print (metrics.f1_score(y_test,y_pred))
+#Tasa de Error
+print(1 - metrics.accuracy_score(y_test,y_pred))
+#Error Cuadrático Medio (MSE)
+print(metrics.mean_squared_error(y_test, y_pred))
